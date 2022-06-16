@@ -1,5 +1,4 @@
 {
-	"!(dist/)*.{js,ts},*rc.js": ["yarn lint"],
-	"{!(package)*.json,*.code-snippets}": ["yarn lint"],
-	"package.json": ["yarn lint"]
+	"!(dist/)*.{js,jsx,ts,tsx},*.config.js": ["yarn lint"],
+	"{!(*rc|package)*.json,*.code-snippets}": ["yarn lint"]
 }
