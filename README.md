@@ -4,7 +4,13 @@ This project is to be the clone of [Uniswap Labs Interface](https://github.com/U
 
 <br />
 
-## Available Scripts
+## Features skipped at the moment
+
+- Internationalization using [LinguiJS](https://lingui.js.org/)
+
+<br />
+
+## Available scripts
 
 In the project directory, you can run:
 
