@@ -47,6 +47,7 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 
 ### References
 
+- [Uniswap](https://app.uniswap.org/#/swap?chain=mainnet)
 - [Uniswap Labs Interface](https://github.com/Uniswap/interface)
 - [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started)
 - [React documentation](https://reactjs.org/)
