@@ -14,6 +14,7 @@ This project is to be the clone of [Uniswap Labs Interface](https://github.com/U
 ## What are picked
 
 - [Reach UI](https://reach.tech/): for accessible design foundation of React app
+- [Redux](https://ko.redux.js.org/introduction/core-concepts): state handling across components
 
 <br />
 
@@ -66,3 +67,4 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 - [React documentation](https://reactjs.org/)
 - [React 17.x + TypeScript + Tailwind CSS 프로젝트 셋업하기](https://github.com/estellechoi/TIL/blob/master/docs/react/setup.md)
 - [React에서 Mobx 경험기 (Redux와 비교기) | 우아한형제들 기술블로그](https://techblog.woowahan.com/2599/)
+- [\<portal\>: The Portal element | MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/portal)
