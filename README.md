@@ -15,6 +15,7 @@ This project is to be the clone of [Uniswap Labs Interface](https://github.com/U
 
 - [Reach UI](https://reach.tech/): for accessible design foundation of React app
 - [Redux](https://ko.redux.js.org/introduction/core-concepts): state handling across components
+- [](https://github.com/ethers-io/ethers.js)
 
 <br />
 

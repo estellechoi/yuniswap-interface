@@ -12,6 +12,7 @@
     "downlevelIteration": true,
     "strict": true,
     "alwaysStrict": true,
+    "noImplicitAny": true,
     "noImplicitReturns": true,
     "noUnusedLocals": false,
     "forceConsistentCasingInFileNames": true,
