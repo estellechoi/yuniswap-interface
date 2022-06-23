@@ -1,6 +1,9 @@
-import { Percent } from '@uniswap/sdk-core'
+import { Percent, Token } from '@uniswap/sdk-core'
+import { Pair } from '@uniswap/v2-sdk'
+import { L2_CHAIN_IDS } from 'constants/chains'
 import { SupportedLocale } from 'constants/locales'
-import { DONATION_END_TIMESTAMP } from 'constants/misc'
+import { DONATION_END_TIMESTAMP, L2_DEADLINE_FROM_NOW } from 'constants/misc'
+import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import useCurrentBlockTimestamp from 'hooks/useCurrentBlockTimestamp'
 import JSBI from 'jsbi'
 import { useCallback, useMemo } from 'react' // This is useful when passing callbacks to optimized child components that rely on reference equality to prevent unnecessary renders
@@ -11,13 +14,47 @@ import {
   updateShowSurveyPopup,
   updateUserClientSideRouter,
   updateUserDarkMode,
+  updateUserDeadline,
   updateUserExpertMode,
   updateUserLocale,
   updateUserSlippageTolerance,
+  UserState,
 } from 'store/user/reducer'
+import { SerializedPair, SerializedToken } from 'store/user/types'
+
+function useUserSelector(): UserState {
+  return useAppSelector(({ user }) => user)
+}
+
+function serializeToken(token: Token): SerializedToken {
+  return {
+    chainId: token.chainId,
+    address: token.address,
+    decimals: token.decimals,
+    symbol: token.symbol,
+    name: token.name,
+  }
+}
+
+function deserializeToken(serializedToken: SerializedToken): Token {
+  return new Token(
+    serializedToken.chainId,
+    serializedToken.address,
+    serializedToken.decimals,
+    serializedToken.symbol,
+    serializedToken.name
+  )
+}
+
+function serializePair(pair: Pair): SerializedPair {
+  return {
+    token0: serializeToken(pair.token0),
+    token1: serializeToken(pair.token1),
+  }
+}
 
 export function useIsDarkMode(): boolean {
-  const { userDarkMode, matchesDarkMode } = useAppSelector(({ user }) => user)
+  const { userDarkMode, matchesDarkMode } = useUserSelector()
   return userDarkMode ?? matchesDarkMode
 }
 
@@ -33,7 +70,7 @@ export function useDarkModeManager(): [boolean, () => void] {
 }
 
 export function useUserLocale(): SupportedLocale | null {
-  const { userLocale } = useAppSelector(({ user }) => user)
+  const { userLocale } = useUserSelector()
   return userLocale
 }
 
@@ -51,7 +88,7 @@ export function useUserLocalManager(): [SupportedLocale | null, (newLocale: Supp
 }
 
 export function useIsExpertMode(): boolean {
-  const { userExpertMode } = useAppSelector(({ user }) => user)
+  const { userExpertMode } = useUserSelector()
   return userExpertMode
 }
 
@@ -68,7 +105,7 @@ export function useExpertModeManager(): [boolean, () => void] {
 
 export function useShowSurveyPopup(): [boolean | undefined, (showPopup: boolean) => void] {
   const dispatch = useAppDispatch()
-  const { showSurveyPopup } = useAppSelector(({ user }) => user)
+  const { showSurveyPopup } = useUserSelector()
 
   const setShowSurveyPopup = useCallback(
     (showPopup: boolean) => {
@@ -82,7 +119,7 @@ export function useShowSurveyPopup(): [boolean | undefined, (showPopup: boolean)
 
 export function useShowDonationLink(): [boolean | undefined, (showLink: boolean) => void] {
   const dispatch = useAppDispatch()
-  const { showDonationLink } = useAppSelector(({ user }) => user)
+  const { showDonationLink } = useUserSelector()
   const setShowDonationLink = useCallback(
     (showLink: boolean) => {
       dispatch(updateShowDonationLink({ showDonationLink: showLink }))
@@ -99,7 +136,7 @@ export function useShowDonationLink(): [boolean | undefined, (showLink: boolean)
 
 export function useClientSideRouter(): [boolean, (clientSideRouter: boolean) => void] {
   const dispatch = useAppDispatch()
-  const { userClientSideRouter } = useAppSelector(({ user }) => user)
+  const { userClientSideRouter } = useUserSelector()
 
   const setClientSideRouter = useCallback(
     (clientSideRouter: boolean) => {
@@ -113,7 +150,7 @@ export function useClientSideRouter(): [boolean, (clientSideRouter: boolean) => 
 
 export function useUserSlippageTolerance(): Percent | 'auto' {
   // userSlippageTolerance in bips like 0.01% → (1 / 10_000) as a unit
-  const { userSlippageTolerance } = useAppSelector(({ user }) => user)
+  const { userSlippageTolerance } = useUserSelector()
 
   return useMemo(
     () => (userSlippageTolerance === 'auto' ? 'auto' : new Percent(userSlippageTolerance, 10_000)),
@@ -158,7 +195,7 @@ export function useUserSlippageToleranceWithDefault(defaultSlippageTolerance: Pe
 export function useUserHideClosedPositions(): [boolean, (hideClosedPositions: boolean) => void] {
   const dispatch = useAppDispatch()
 
-  const { userHideClosedPositions } = useAppSelector(({ user }) => user)
+  const { userHideClosedPositions } = useUserSelector()
 
   const setHideClosedPositions = useCallback(
     (hideClosedPositions: boolean) => {
@@ -171,6 +208,25 @@ export function useUserHideClosedPositions(): [boolean, (hideClosedPositions: bo
 }
 
 export function useURLWarningVisible(): boolean {
-  const { URLWarningVisible } = useAppSelector(({ user }) => user)
+  const { URLWarningVisible } = useUserSelector()
   return URLWarningVisible
+}
+
+// set user deadline
+export function useUserTransactionTTL(): [number, (slippage: number) => void] {
+  const dispatch = useAppDispatch()
+  const { chainId } = useActiveWeb3React()
+  const { userDeadline } = useUserSelector()
+
+  const isOnL2 = Boolean(chainId && L2_CHAIN_IDS.includes(chainId))
+  const deadline = isOnL2 ? L2_DEADLINE_FROM_NOW : userDeadline
+
+  const setUserDeadline = useCallback(
+    (userDeadline: number) => {
+      dispatch(updateUserDeadline({ userDeadline }))
+    },
+    [dispatch]
+  )
+
+  return [deadline, setUserDeadline]
 }
