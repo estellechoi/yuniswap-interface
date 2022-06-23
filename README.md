@@ -16,6 +16,7 @@ This project is to be the clone of [Uniswap Labs Interface](https://github.com/U
 - [Reach UI](https://reach.tech/): for accessible design foundation of React app
 - [Redux](https://ko.redux.js.org/introduction/core-concepts): state handling across components
 - [Ethers BigNumber](https://github.com/ethers-io/ethers.js): bignumber handling
+- [`@uniswap/sdk-core`](https://github.com/Uniswap/sdk-core): to use classes like `Token`, `Percent` and so on, internally using [`jsbi`](https://github.com/GoogleChromeLabs/jsbi) for safe `BigInt` handling
 
 <br />
 

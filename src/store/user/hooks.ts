@@ -1,14 +1,19 @@
+import { Percent } from '@uniswap/sdk-core'
 import { SupportedLocale } from 'constants/locales'
 import { DONATION_END_TIMESTAMP } from 'constants/misc'
 import useCurrentBlockTimestamp from 'hooks/useCurrentBlockTimestamp'
-import { useCallback } from 'react' // This is useful when passing callbacks to optimized child components that rely on reference equality to prevent unnecessary renders
+import JSBI from 'jsbi'
+import { useCallback, useMemo } from 'react' // This is useful when passing callbacks to optimized child components that rely on reference equality to prevent unnecessary renders
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import {
+  updateHideClosedPositions,
   updateShowDonationLink,
   updateShowSurveyPopup,
+  updateUserClientSideRouter,
   updateUserDarkMode,
   updateUserExpertMode,
   updateUserLocale,
+  updateUserSlippageTolerance,
 } from 'store/user/reducer'
 
 export function useIsDarkMode(): boolean {
@@ -90,4 +95,82 @@ export function useShowDonationLink(): [boolean | undefined, (showLink: boolean)
   const isDonationLinkVisible = showDonationLink !== false && !isDurationOver
 
   return [isDonationLinkVisible, setShowDonationLink]
+}
+
+export function useClientSideRouter(): [boolean, (clientSideRouter: boolean) => void] {
+  const dispatch = useAppDispatch()
+  const { userClientSideRouter } = useAppSelector(({ user }) => user)
+
+  const setClientSideRouter = useCallback(
+    (clientSideRouter: boolean) => {
+      dispatch(updateUserClientSideRouter({ userClientSideRouter: clientSideRouter }))
+    },
+    [dispatch]
+  )
+
+  return [userClientSideRouter, setClientSideRouter]
+}
+
+export function useUserSlippageTolerance(): Percent | 'auto' {
+  // userSlippageTolerance in bips like 0.01% → (1 / 10_000) as a unit
+  const { userSlippageTolerance } = useAppSelector(({ user }) => user)
+
+  return useMemo(
+    () => (userSlippageTolerance === 'auto' ? 'auto' : new Percent(userSlippageTolerance, 10_000)),
+    [userSlippageTolerance]
+  )
+}
+
+export function useSetSlippageTolerance(): (slippageTolerance: Percent | 'auto') => void {
+  const dispatch = useAppDispatch()
+
+  const setSlippageTolerance = useCallback(
+    (slippageTolerance: Percent | 'auto') => {
+      let userSlippageTolerance: number | 'auto'
+
+      try {
+        userSlippageTolerance =
+          slippageTolerance === 'auto' ? 'auto' : JSBI.toNumber(slippageTolerance.multiply(10_000).quotient)
+      } catch (err) {
+        userSlippageTolerance = 'auto'
+      }
+
+      dispatch(updateUserSlippageTolerance({ userSlippageTolerance }))
+    },
+    [dispatch]
+  )
+
+  return setSlippageTolerance
+}
+
+/**
+ * Same as above but replaces the auto with a default value
+ * @param defaultSlippageTolerance the default value to replace auto with
+ */
+export function useUserSlippageToleranceWithDefault(defaultSlippageTolerance: Percent): Percent {
+  const allowedSlippage = useUserSlippageTolerance()
+  return useMemo(
+    () => (allowedSlippage === 'auto' ? defaultSlippageTolerance : allowedSlippage),
+    [allowedSlippage, defaultSlippageTolerance]
+  )
+}
+
+export function useUserHideClosedPositions(): [boolean, (hideClosedPositions: boolean) => void] {
+  const dispatch = useAppDispatch()
+
+  const { userHideClosedPositions } = useAppSelector(({ user }) => user)
+
+  const setHideClosedPositions = useCallback(
+    (hideClosedPositions: boolean) => {
+      dispatch(updateHideClosedPositions({ userHideClosedPositions: hideClosedPositions }))
+    },
+    [dispatch]
+  )
+
+  return [userHideClosedPositions, setHideClosedPositions]
+}
+
+export function useURLWarningVisible(): boolean {
+  const { URLWarningVisible } = useAppSelector(({ user }) => user)
+  return URLWarningVisible
 }

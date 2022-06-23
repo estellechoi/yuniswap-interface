@@ -18,7 +18,9 @@ export interface UserState {
   userExpertMode: boolean
   userClientSideRouter: boolean // whether routes should be calculated with the client side router only
   userHideClosedPositions: boolean
-  userSlippageTolerance: number | 'auto' // user defined slippage tolerance in bips, used in all txns
+  userSlippageTolerance: number | 'auto'
+  // user defined slippage tolerance in bips, used in all txns
+  // Basis points, otherwise known as bps or "bips," are a unit of measure used in finance to describe the percentage change in the value of financial instruments or the rate change in an index or other benchmark. One basis point is equivalent to 0.01% (1/100th of a percent) or 0.0001 in decimal form.
   userSlippageToleranceHasBeenMigratedToAuto: boolean // temporary flag for migration status
   userDeadline: number
   tokens: {
