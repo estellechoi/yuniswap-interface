@@ -117,6 +117,7 @@ export const slice = createSlice({
       state.showDonationLink = showDonationLink
     },
     addSerializedToken(state, { payload: { serializedToken } }: PayloadAction<{ serializedToken: SerializedToken }>) {
+      // there's an initial value of {} for tokens field, then why falsy check is needed here ?
       if (!state.tokens) {
         state.tokens = {}
       }

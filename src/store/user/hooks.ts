@@ -9,6 +9,8 @@ import JSBI from 'jsbi'
 import { useCallback, useMemo } from 'react' // This is useful when passing callbacks to optimized child components that rely on reference equality to prevent unnecessary renders
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import {
+  addSerializedToken,
+  removeSerializedToken,
   updateHideClosedPositions,
   updateShowDonationLink,
   updateShowSurveyPopup,
@@ -230,3 +232,41 @@ export function useUserTransactionTTL(): [number, (slippage: number) => void] {
 
   return [deadline, setUserDeadline]
 }
+
+export function useAddUserToken(): (token: Token) => void {
+  const dispatch = useAppDispatch()
+  const addUserToken = useCallback(
+    (token: Token) => {
+      const serializedToken = serializeToken(token)
+      dispatch(addSerializedToken({ serializedToken }))
+    },
+    [dispatch]
+  )
+
+  return addUserToken
+}
+
+export function useRemoveUserAddedToken(): (chainId: number, address: string) => void {
+  const dispatch = useAppDispatch()
+  const removeUserAddedToken = useCallback(
+    (chainId: number, address: string) => {
+      dispatch(removeSerializedToken({ chainId, address }))
+    },
+    [dispatch]
+  )
+
+  return removeUserAddedToken
+}
+
+export function useUserAddedToken(): Token[] {
+  const { chainId } = useActiveWeb3React()
+  const { tokens } = useUserSelector()
+
+  return useMemo(() => {
+    if (!chainId) return []
+    const tokensMap: Token[] = Object.values(tokens[chainId]).map(deserializeToken)
+    return tokensMap
+  }, [tokens, chainId])
+}
+
+// Pair hooks are coming here
