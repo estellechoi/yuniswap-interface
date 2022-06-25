@@ -9,6 +9,7 @@ import JSBI from 'jsbi'
 import { useCallback, useMemo } from 'react' // This is useful when passing callbacks to optimized child components that rely on reference equality to prevent unnecessary renders
 import { useAppDispatch, useAppSelector } from 'store/hooks'
 import {
+  addSerializedPair,
   addSerializedToken,
   removeSerializedToken,
   updateHideClosedPositions,
@@ -269,4 +270,21 @@ export function useUserAddedToken(): Token[] {
   }, [tokens, chainId])
 }
 
-// Pair hooks are coming here
+export function useAddUserPair(): (pair: Pair) => void {
+  const dispatch = useAppDispatch()
+  const addUserPair = useCallback(
+    (pair: Pair) => {
+      const serializedPair = serializePair(pair)
+      dispatch(addSerializedPair({ serializedPair }))
+    },
+    [dispatch]
+  )
+
+  return addUserPair
+}
+
+/**
+ * Given two tokens return the liquidity token that represents its liquidity shares
+ * @param tokenA one of the two tokens
+ * @param tokenB the other token
+ */
