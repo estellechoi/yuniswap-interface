@@ -13,6 +13,7 @@ This project is to be the clone of [Uniswap Labs Interface](https://github.com/U
 
 ## What are picked
 
+- [`ua-parser-js`](https://github.com/faisalman/ua-parser-js): to use userAgent info
 - [Reach UI](https://reach.tech/): for accessible design foundation of React app
 - [Redux](https://ko.redux.js.org/introduction/core-concepts): state handling across components
 - [Ethers BigNumber](https://github.com/ethers-io/ethers.js): bignumber handling

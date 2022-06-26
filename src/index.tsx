@@ -1,18 +1,41 @@
 import './index.css'
 import '@reach/dialog/styles.css'
 
+import App from 'App'
+import BlockList from 'components/BlockList'
+import Web3Provider from 'components/Web3Provider'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
+import { HashRouter } from 'react-router-dom'
+import reportWebVitals from 'reportWebVitals'
+import store from 'store'
+import UserUpdater from 'store/user/updater'
+import ThemeProvider from 'theme'
+import RadialGradientByChainUpdater from 'theme/RadialGradientByChainUpdater'
 
-import App from './App'
-import reportWebVitals from './reportWebVitals'
-import store from './store'
+function Updaters() {
+  return (
+    <>
+      <RadialGradientByChainUpdater />
+      <UserUpdater />
+    </>
+  )
+}
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <App />
+      <HashRouter>
+        <Web3Provider>
+          <BlockList>
+            <Updaters />
+            <ThemeProvider>
+              <App />
+            </ThemeProvider>
+          </BlockList>
+        </Web3Provider>
+      </HashRouter>
     </Provider>
   </React.StrictMode>,
   document.getElementById('root') as HTMLElement
