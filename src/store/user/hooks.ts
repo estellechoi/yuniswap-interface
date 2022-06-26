@@ -1,5 +1,6 @@
 import { Percent, Token } from '@uniswap/sdk-core'
-import { Pair } from '@uniswap/v2-sdk'
+import { computePairAddress, Pair } from '@uniswap/v2-sdk'
+import { V2_FACTORY_ADDRESSES } from 'constants/addresses'
 import { L2_CHAIN_IDS } from 'constants/chains'
 import { SupportedLocale } from 'constants/locales'
 import { DONATION_END_TIMESTAMP, L2_DEADLINE_FROM_NOW } from 'constants/misc'
@@ -287,4 +288,21 @@ export function useAddUserPair(): (pair: Pair) => void {
  * Given two tokens return the liquidity token that represents its liquidity shares
  * @param tokenA one of the two tokens
  * @param tokenB the other token
+ */
+export function toV2LiquidityToken([tokenA, tokenB]: [Token, Token]): Token {
+  if (tokenA.chainId !== tokenB.chainId) throw new Error('Not matching chain IDs')
+  if (tokenA.equals(tokenB)) throw new Error('Tokens cannot be equal')
+  if (!V2_FACTORY_ADDRESSES[tokenA.chainId]) throw new Error('No V2 factory address on this chain')
+
+  return new Token(
+    tokenA.chainId,
+    computePairAddress({ factoryAddress: V2_FACTORY_ADDRESSES[tokenA.chainId], tokenA, tokenB }),
+    18,
+    'UNI-v2',
+    'Uniswap V2'
+  )
+}
+
+/**
+ * Returns all the pairs of tokens that are tracked by the user for the current chain ID.
  */
